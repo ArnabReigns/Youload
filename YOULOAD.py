@@ -9,7 +9,7 @@ from rich.console import Console
 from rich.table import Table
 from rich.progress import track
 from rich.progress import Progress
-from os import name, path, system
+from os import name, path, sep, system
 from pathlib import Path
 
 
@@ -84,7 +84,7 @@ def takeReq(video):
         takeReq(video)   
 
 def progressbar(stream, chunk, bytes_remaining):
-    x = ((stream.filesize - bytes_remaining)/stream.filesize)*100 
+    x = ((stream.filesize - bytes_remaining)/stream.filesize)*100
     print(f">> {round(x) } % completed")
 
 def Video(video):
@@ -128,18 +128,23 @@ def Video(video):
         
 
         if isinstance(fileIndex,int) and (fileIndex <= len(list)) and (fileIndex >= 0):
-            dest= Path(f"{downloads_path}\{list[fileIndex-1].default_filename}")
             title = f"{list[fileIndex-1].title}"
-            i = 0 
 
+            remove = ['\\','/',':','*','?','"','<','>','|']
+            
+            for f in remove:
+                title = title.replace(f," ")
+            dest= Path(f"{downloads_path}\{title}.{list[fileIndex-1].subtype}")
+            i = 0 
+            p = title
             while dest.is_file():
                 i = i+1
-                dest =  Path(f"{downloads_path}\{list[fileIndex-1].title}({i}).{list[fileIndex-1].subtype}")
-                title = f"{list[fileIndex-1].title}({i})"
-                
-                
-
-
+                p = f"{title}({i})"
+                dest =  Path(f"{downloads_path}\{p}.{list[fileIndex-1].subtype}")
+            
+            title = p
+            
+            
 
             print()
             print(">>  downloaing....")
@@ -205,27 +210,37 @@ def Audio(Video):
     fileIndex = int(input(">> enter the index of the Audio to download: "))
 
     def download(fileIndex):
-    
+
         
         print()
         if isinstance(fileIndex,int) and fileIndex <= len(list) and fileIndex > 0:
-            dest= Path(f"{downloads_path}\{list[fileIndex-1].title}.mp3")
             title = f"{list[fileIndex-1].title}"
+            
+
+            remove = ['\\','/',':','*','?','"','<','>','|']
+            
+            for f in remove:
+                title = title.replace(f," ")
+            dest= Path(f"{downloads_path}\{title}.mp3")
             i = 0 
+            a = title
+
 
             while dest.is_file():
                 i = i+1
-                dest =  Path(f"{downloads_path}\{list[fileIndex-1].title}({i}).mp3")
-                title = f"{list[fileIndex-1].title}({i})"
-
+                a = f"{title}({i})"
+                dest =  Path(f"{downloads_path}\{a}.mp3")
+                
+            
+            title = a
 
 
             print()
             print(">>  downloaing....")
             print()
-            list[fileIndex-1].download(output_path=downloads_path,filename = f"{title}.mp3")
+            file=list[fileIndex-1].download(output_path=downloads_path,filename=f"{title}.mp3")
             print()
-            print(f">> file location : {dest}")
+            print(colored(f">> file location : {dest}","green"))
             print()
             print()
             print("..................................................................................................................................")
@@ -243,18 +258,13 @@ def Audio(Video):
     
     download(fileIndex)
 
-   
 while True:
-    
     try:
         start()
     except:
         print()
-        print(colored(">> it was not a correct youtube url","red"))
+        print(colored('you might have entered an incorrect url. Please try again','red'))
         print()
-        pass
-
-
 
 
 
